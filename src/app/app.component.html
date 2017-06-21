@@ -28,18 +28,64 @@
 
 	<div class="form-group">
 		<label for="selectedCar">Car Type</label>
-		<select class="form-control" [ngModel]="selectedCar" (ngModelChange)="selectCar($event)">
-			<option [value]="car.id" *ngFor="let car of cars" [selected]="car.label == 'None' ? true : null">{{car.label}}</option>
+		<!-- <select class="form-control" name="selectedCar" [(ngModel)]="selectedCar">
+			<option [ngValue]="car" *ngFor="let car of cars">{{car}}</option>
+		</select> -->
+		<select class="form-control" name="selectedCar" [(ngModel)]="dropDownSelectCar">
+			<option [ngValue]="car" *ngFor="let car of carsArray">{{car.name}}</option>
 		</select>
 	</div>
 	<div class="form-group">
 		<label for="destination">Destination</label>
 		<input placeholder="Destination" autocorrect="off" autocapitalize="off" spellcheck="off" type="text" class="form-control" #destination ng-model="destinationLocation">
 	</div>
-	<div class="form-group" *ngIf="thisDistance || duration">
+	<div class="form-group" *ngIf="distance && duration">
 		<div class="form-group">
-			<label for="distance">Distance: {{ thisdistance }}</label>
+			<label for="distance">Distance: {{ distance }}</label>
 			<label for="duration">Duration: {{ duration }}</label>
 		</div>
 	</div>
+	<button type="submit" class="btn btn-primary" [disabled]="!distance || !duration || dropDownSelectCar.id == 0" (click)="modal.open()">Calculate Fare</button>
+	<button type="submit" class="btn btn-info">Clear</button>
+
+	<modal #modal >
+		<modal-header [show-close]="true">
+			<h4 class="modal-title">Your Customized Fare</h4>
+		</modal-header>
+		<modal-body>
+			<!-- <div class="row-fluid">
+				Distance: {{convertStringToNumber(distance,1)}}
+			</div>
+			<div class="row-fluid">
+				Trip Time: {{convertStringToNumber(duration,2)}}
+			</div> -->
+			<div class="row-fluid text-center">
+				<strong>Total Fare: {{fareCalculator(dropDownSelectCar) | currency: 'USD':true:'1.2-2'}}&nbsp;<span class='glyphicon glyphicon-info-sign' (click)="showInfoPanel()"></span> </strong>
+			</div>
+			<div class="row-fluid alert alert-info alert-dismissable" *ngIf="infoPanel">
+				<strong>Fare Breakdown:</strong>
+				<div class="row-fluid">
+					Base Fare: {{dropDownSelectCar.fare.baseFare | currency: 'USD':true:'1.2-2'}}<br/>
+					Per Mile: {{dropDownSelectCar.fare.perMile | currency: 'USD':true:'1.2-2'}}<br/>
+					Per Miunte: {{dropDownSelectCar.fare.perMinute | currency: 'USD':true:'1.2-2'}}<br/>
+					Minimum Fare: {{dropDownSelectCar.fare.minimumFare | currency: 'USD':true:'1.2-2'}}<br/>
+				</div>
+			</div>
+			<div class="row-fluid">
+				<strong>Confirm your ride</strong>
+			</div>
+			<div class="form-group">
+				<label for="email">Email</label>
+				<input type="text" placeholder="Email" class="form-control">
+			</div>
+			<div class="form-group">
+				<label for="phone">Phone</label>
+				<input type="number" class="form-control" placeholder="Phone Number">
+			</div>
+			<div class="form-group">
+				<button class="btn btn-primary" type="submit">Confirm</button>
+			</div>
+		</modal-body>
+		<modal-footer [show-default-buttons]="true"></modal-footer>
+	</modal>		
 </div>
