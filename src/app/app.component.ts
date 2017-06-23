@@ -6,7 +6,9 @@ import { DirectionsMapDirective } from './sebm.googlemaps.directions';
 import { Observable } from 'rxjs/Rx';
 import {} from '@types/googlemaps';
 import {Fare, Car} from './app.fare';
+import { Http, Response } from '@angular/http';
 import { DistanceService } from './app.getDistance';
+import { Headers, RequestOptions, RequestMethod } from '@angular/http';
 declare var google: any;
 
 @Component({
@@ -57,6 +59,7 @@ export class AppComponent implements OnInit {
 	constructor(
 		private mapsAPILoader: MapsAPILoader,
 		private ngZone: NgZone,
+		private http: Http
 		) {}
 
 	public distance: string;
@@ -218,5 +221,19 @@ export class AppComponent implements OnInit {
 			break;
 		}
 		return fullFare;
+	}
+
+	private postUrl = 'http://calculator.amitnandanp.com/mail/sendmail.php';
+
+	public sendEmail(toAddress: string): void{
+		let fare = this.fareCalculator(this.dropDownSelectCar).toFixed(2);
+		let body = 'email='+toAddress+'&carType='+this.dropDownSelectCar.name+'&fare='+fare;
+		let head = new Headers({
+			'Content-Type': 'application/x-www-form-urlencoded'
+		});
+		this.http.post(this.postUrl, body, {headers: head})
+					.map(res => res)
+					.subscribe();
+
 	}
 }
